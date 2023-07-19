@@ -112,4 +112,146 @@ Geralmente é complementada por outra autenticação (como autenticação por co
         - Armazenamento da senha
             - Senha deve ser armazenada na forma de HASH;
                 - diminui a chance de ataque interno (de DBA's, devs e etc);
-                - 
+
+## Hash para armazenar senha
+
+Literalmente mistura
+
+Criptografia de mão única (uma vez feito o hash, não é possivel fazer engenharia reversa e descobrir a senha)
+
+Não tem chave
+
+Resultado tem sempre o mesmo tamanho
+
+MD5, SHA1, SHA256, SHA512
+
+MD5 e SHA1 não são recomendados.
+Tiveram ataque de colisão provado, o que torna altas as possibilidades de serem quebrados em breve.
+
+Vale a pena colocar o SHA512
+
+Em tese, pode-se usar uma ASIC de bitcoin para quebrar uma senha SHA256
+
+Rainbow Table Cracking tem otimizações para realizar brute force no hash (testar todas as senhas para gerar aquele hash)
+
+Nunca se armazena somente o hash da senha.
+Fazemos o seguinte: concatenamos o login + senha + salt e apos isso calculamos o hash de tudo
+
+Salt: um conjunto de caracteres relativamente grande que deve ser guardado a parte do usuario.
+
+Quando você for fazer login, devemos solicitar o hash do BD e calcular o hash e ver se ta correto.
+
+## Ciclo de Vida do Usuário
+
+- Criação
+    - Controle e auditoria
+    - Senha inicial
+
+- Manutenção
+    - Férias/Horário de Trabalho
+    - Troca periódica da senha
+
+- Desligamento
+
+## Uso de mecanismos padrão para autenticação
+
+- Já existem formas prontas que já atende muito desses requisitos
+
+- Autenticação Federada
+    - OAUTH
+    - XAML
+
+- Autenticação do Servidor
+
+- LDAP
+
+## Identity Manager
+
+- Aplicações próprias para gerenciar o ciclo de vida de usuários
+
+- IBM TIM
+- CA eTrust Admin
+- Novell IM
+- Oracle IM
+- Keycloak
+
+- Usam LDAP para manter usuários e sincronizar com aplicações geridas.
+
+## Token de Sessão
+
+- Cookie
+    - BD que fica armazenado no nosso navegador
+    - Pode ser lido pelo servidor da aplicação
+    - Na requisição vai automaticamente o cookie
+- Campo oculto
+- URL
+
+Formato de um Cookie:
+
+Valor | Dominio | Expires | Secure | HttpOnly
+
+Expires - pode ser 0 para expirar assim que o browser for fechado
+Secure - enviado somente via SSL
+HttpOnly - Não acessivel via JavaScript
+
+**Não existe segurança em sistemas sem https**
+
+## Para que serve cookies?
+
+- Gerenciamento de Sessão
+    - TCP/IP e HTTPS são protocolos sem sessão
+    - Guardar um ID no Navegador para indicar a sessão
+
+- Personalização
+    - Um sistema registra o que o usuário fez para uso posterior;
+    - Loguin automático do gmail, por exemplo.
+
+- Tracking
+    - Sites que identificam a história de navegação
+
+## Uso de mecanismos padrão para controle de sessão
+
+- Já existem formas prontas que já atende muitos desses requisitos
+    - Servidores modernos fazem trabalho melhor que você faria
+
+- Autenticação federada
+    - JWT
+    - Tokens OAUTH ou SAML
+
+- Valide a sessão
+
+## Como evitar falha na autenticação ou controle de sessão?
+
+- Usar mecanismos de autenticação e controle de sessão prontos
+    - Não, não tem motivos para desenvolver um mecanismo de autenticação.
+
+- Cuidados na manutenção do token de sessão
+    - HTTPs sempre, certificado valido, criptografia atualizada
+    - HSTS, header que exige HTTPs e não permite contorno
+    - Atributos de proteção de corretos
+    - Cuidados com injeção de script
+
+## Protocolos HTTPS
+
+SSL 1.0, 2.0, 3.0 - Deprecado (todos)
+TLS 1.0, 1.1, 1.2, 1.3 ( devem ser utilizados )
+    - 1.0: não recomendado
+    - 1.1: ok, porém não recomendado
+    - 1.2: ok, maior parte ainda usa
+    - 1.3: Melhor opção (disponibilizado em 2019) , disponivel apenas para servidores e clientes mais novos
+
+ETS 1.0: não recomendado (Eletronic Frontier Foundation não recomenda) 
+
+## Não acostume mal seus usuários
+
+- Uso de certificados válidos é importante
+- Se a empresa precisa de muitos, pode ser economicamente viável se tornar uma CA;
+- Usuários acostumados a seguir em telas desse tipo ficam vulneráveis a man-in-the middle
+    - essa tela aparece justamente para avisar o usuário     
+- HSTS
+    - Strict-Transport-Security: max-age=31536000
+    (retira a opção de certficado inválido)
+
+## A2 - Quebra de autenticação
+
+
